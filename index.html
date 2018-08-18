@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>面向对象编程</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<style>
+    *{margin: 0;padding: 0;}
+    #wrap,#wrap_I {
+        position: relative;
+        overflow: hidden;
+        width: 500px;
+        height: 300px;
+        margin: 20px auto;
+    }
+    #list li,#list_I li {
+        position: absolute;
+        width: 100%;
+        height: 300px;
+        color: #fff;
+        font-size: 100px;
+        text-align: center;
+        line-height: 300px;
+    }
+    #list li.active,#list_I li.active {
+        z-index: 1;
+    }
+    #tab,#tab_I {
+        position: absolute;
+        left: 50%;
+        bottom: 10px;
+        z-index: 10;
+        margin-left: -35px;
+    }
+    #tab li,#tab_I li {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        border-radius: 50%;
+    }
+    #tab li.active,#tab_I li.active {
+        background: rgba(255,10,0,.5);
+    }
+    #wrap_I:hover button {
+        display: block;
+    }
+    #wrap_I button {
+        display: none;
+        position: absolute;
+        top: 50%;
+        margin-top: -25px;
+        z-index: 2;
+        width: 30px;
+        height: 50px;
+        opacity: 0.5;
+        background: skyblue;
+        border: 0;
+        outline: 0;
+    }
+    #wrap_I button:hover {
+        opacity: 0.8;
+    }
+    #wrap_I .btnright {
+        right: 0;
+    }
+</style>
+</head>
+<body>
+    <div id="wrap">
+        <ul id="list">
+            <li class="active">一</li>
+            <li>二</li>
+            <li>三</li>
+            <li>四</li>
+            <li>五</li>
+        </ul>
+        <ul id="tab">
+            <li class="active"></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div id="wrap_I">
+            <ul id="list_I">
+                <li class="active">一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+            </ul>
+            <ul id="tab_I">
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <button class="btnleft"> < </button>
+            <button class="btnright"> > </button>
+        </div>
+    <script>
+        function Broadcast(json){
+            this.listLi = json.listLi;
+            this.tabLi = json.tabLi;
+            this.index = 0;
+            this.getColor();
+            this.switchImg();
+        }
+        Broadcast.prototype = {
+            // 指向构造函数
+            constructor : Broadcast,
+            // 给li添加不同颜色
+            getColor : function (){
+                for (let i = 0, len = this.listLi.length; i < len; i++) {
+                    let color = `#`;
+                    for (let j = 0; j <= 5; j++) {
+                        color += Math.floor(Math.random()*16).toString(16);
+                    };
+                    this.listLi[i].style.background = color;
+                };
+            },
+            // 点击切换函数
+            switchImg : function (){
+                let that = this;
+                for (let i = 0, len = this.tabLi.length; i < len; i++) {
+                    this.tabLi[i].onclick = function (){
+                        that.tabLi[that.index].className = "";
+                        that.listLi[that.index].className = "";
+                        this.className = "active";
+                        that.listLi[i].className = "active";
+                        that.index = i;
+                    };
+                };
+            },
+        };
+        let obj = new Broadcast({
+            listLi : document.getElementById("list").children,
+            tabLi : document.getElementById("tab").children,
+        });
+
+
+
+
+
+        //继承Broadcast函数
+        function Broadcast_I(obj){
+            /*this.listLi = json.listLi;
+            this.tabLi = json.tabLi;
+            this.index = 0;
+            this.getColor();
+            this.switchImg();*/
+
+            // 先调用继承函数
+            this.inheritFn();
+            // 再执行原函数，并把指向改变为当前构造函数new的对象
+            Broadcast.call(this, obj);
+            this.btnChange();
+        };
+        Broadcast_I.prototype = {
+            constructor : Broadcast_I,
+            inheritFn : function (){
+                for (let key in Broadcast.prototype) {
+                    Broadcast_I.prototype[key] = Broadcast.prototype[key];
+                };
+            },
+            btnChange : function (){
+                let aBtn = document.getElementById("wrap_I").getElementsByTagName("button"),
+                    that = this;
+                for (let i = 0, len = aBtn.length; i < len; i++) {
+                    aBtn[i].onclick = function (){
+                        that.listLi[that.index].className = "";
+                        that.tabLi[that.index].className = "";
+                        if (i==0) {
+                            that.index--;
+                            that.index = that.index < 0 ? 4 : that.index;
+                        } else {
+                            that.index++;
+                            that.index = that.index > 4 ? 0 : that.index;
+                        }
+                        that.listLi[that.index].className = "active";
+                        that.tabLi[that.index].className = "active";
+                    }
+                }
+            },
+        }
+        let obj2 = new Broadcast_I({
+            listLi : document.getElementById("list_I").children,
+            tabLi : document.getElementById("tab_I").children,
+        });
+
+        // console.log(obj2)
+    </script>
+</body>
+</html>
